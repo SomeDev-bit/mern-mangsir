@@ -10,10 +10,11 @@ mongoose.connect(process.env.MONGO_URI).then((val) => {
   app.listen(5000, () => {
     console.log('Database connected and listening');
   });
-
 }).catch((err) => {
   console.log(err);
 });
+
+app.use(express.json());
 
 app.get('/', (req, res) => {
   return res.status(200).json([11, 22, 44, 55]);
