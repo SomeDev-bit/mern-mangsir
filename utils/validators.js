@@ -18,3 +18,10 @@ export const registerSchema = Joi.object({
   username: Joi.string().min(6).required(),
   ...authSchema
 });
+
+export const productSchema = Joi.object({
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  price: Joi.number().required(),
+  category: Joi.string().valid('electronics', 'jewelery', 'men\'s clothing', 'women\'s clothing', 'other').required()
+});
