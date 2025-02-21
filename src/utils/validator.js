@@ -10,10 +10,14 @@ export const passwordValidator = /^((?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@
 
 
 
-export const valSchema = Yup.object({
-  title: Yup.string().min(10).max(200).required(),
-  detail: Yup.string().max(500).required(),
-  locate: Yup.string().required(),
-  genres: Yup.array().min(1).required(),
-  country: Yup.string().required(),
+export const loginSchema = Yup.object({
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string().required('Password is required'),
+});
+
+
+export const registerSchema = Yup.object({
+  username: Yup.string().required('Username is required'),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string().required('Password is required'),
 });

@@ -1,11 +1,9 @@
 import React from 'react'
 import { createBrowserRouter } from 'react-router'
-import Home from './pages/Home';
-import About from './pages/About';
 import { RouterProvider } from 'react-router-dom';
-import RootLayout from './components/RootLayout';
-import AddForm from './pages/AddForm';
-import EditForm from './pages/EditForm';
+import Login from './features/auth/Login';
+import RootLayout from './ui/RootLayout';
+import Register from './features/auth/Register';
 
 const App = () => {
 
@@ -17,22 +15,15 @@ const App = () => {
       children: [
         {
           index: true,
-          element: <Home />,
-
-        },
-        {
-          path: 'add-form',
-          element: <AddForm />,
-        },
-        {
-          path: 'edit-form/:id',
-          element: <EditForm />,
+          element: <Login />,
         },
 
+
         {
-          path: 'about',
-          element: <About />
-        }
+          path: 'register',
+          element: <Register />,
+        },
+
 
       ]
     },
