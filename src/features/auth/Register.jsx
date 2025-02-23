@@ -3,21 +3,30 @@ import { Formik } from 'formik'
 import React, { useState } from 'react'
 import { registerSchema } from '../../utils/validator';
 import { useNavigate } from 'react-router';
+import { useRegisterUserMutation } from './authApi';
+import { toast } from 'react-toastify';
 
 const Register = () => {
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [pass, setPass] = useState(false);
   const nav = useNavigate();
   return (
-    <div className='max-w-[400px] p-4'>
+    <div className='max-w-[400px] p-4  mx-auto mt-9'>
       <Formik
         initialValues={{
           username: '',
           email: '',
           password: '',
-
         }}
-        onSubmit={(val) => {
-          console.log(val);
+        onSubmit={async (val) => {
+          try {
+            await registerUser(val).unwrap();
+            toast.success('register Successfully');
+            nav(-1);
+          } catch (err) {
+
+            toast.error(err.data?.message);
+          }
         }}
         validationSchema={registerSchema}
       >
@@ -37,7 +46,7 @@ const Register = () => {
 
               <Input
                 onChange={handleChange}
-                value={values.email}
+                value={values.username}
                 label='Username'
                 type='text'
                 name='username'
@@ -80,6 +89,7 @@ const Register = () => {
 
 
             <Button
+              loading={isLoading}
               type='submit'
               className='w-full py-[9px]' size='sm'>Submit</Button>
 

@@ -3,20 +3,34 @@ import { Formik } from 'formik'
 import React, { useState } from 'react'
 import { loginSchema } from '../../utils/validator'
 import { useNavigate } from 'react-router'
+import { toast } from 'react-toastify'
+import { useLoginUserMutation } from './authApi'
+import { useDispatch } from 'react-redux'
+import { setUserToLocal } from './userSlice'
 
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const [loginUser, { isLoading }] = useLoginUserMutation();
   const [pass, setPass] = useState(false);
   const nav = useNavigate();
   return (
-    <div className='max-w-[400px] p-4'>
+    <div className='max-w-[400px] p-4 mx-auto mt-9'>
       <Formik
         initialValues={{
           email: '',
           password: '',
         }}
-        onSubmit={(val) => {
-          console.log(val);
+        onSubmit={async (val) => {
+          try {
+            const response = await loginUser(val).unwrap();
+            dispatch(setUserToLocal(response.data));
+            toast.success('Login Successfully');
+            nav(-1);
+          } catch (err) {
+            console.log(err);
+            toast.error(err.data?.message);
+          }
         }}
         validationSchema={loginSchema}
       >
@@ -44,29 +58,36 @@ const Login = () => {
               {errors.email && touched.email && <p className='text-red-500 text-sm'>{errors.email}</p>}
             </div>
 
-            <div className="relative flex w-full max-w-[24rem]">
-              <Input
-                onChange={handleChange}
-                value={values.password}
-                label='Password'
-                type={pass ? 'text' : 'password'}
-                name='password'
-                className="pr-20"
-                containerProps={{
-                  className: "min-w-0",
-                }}
-              />
-              <IconButton
-                onClick={() => setPass(!pass)}
-                variant='text' className="!absolute right-1 top-1 rounded" size='sm'>
-                <i className={`fa ${pass ? 'fa-unlock' : 'fa-lock'}`} />
-              </IconButton>
+
+            <div>
+
+
+              <div className="relative flex w-full max-w-[24rem]">
+                <Input
+                  onChange={handleChange}
+                  value={values.password}
+                  label='Password'
+                  type={pass ? 'text' : 'password'}
+                  name='password'
+                  className="pr-20"
+                  containerProps={{
+                    className: "min-w-0",
+                  }}
+                />
+                <IconButton
+                  onClick={() => setPass(!pass)}
+                  variant='text' className="!absolute right-1 top-1 rounded" size='sm'>
+                  <i className={`fa ${pass ? 'fa-unlock' : 'fa-lock'}`} />
+                </IconButton>
+
+              </div>
               {errors.password && touched.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
             </div>
 
 
 
             <Button
+              loading={isLoading}
               type='submit'
               className='w-full py-[9px]' size='sm'>Submit</Button>
 

@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import Login from './features/auth/Login';
 import RootLayout from './ui/RootLayout';
 import Register from './features/auth/Register';
+import ProductList from './features/product/ProductList';
 
 const App = () => {
 
@@ -15,9 +16,12 @@ const App = () => {
       children: [
         {
           index: true,
+          element: <ProductList />,
+        },
+        {
+          path: 'login',
           element: <Login />,
         },
-
 
         {
           path: 'register',
