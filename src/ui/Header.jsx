@@ -51,6 +51,7 @@ const adminMenuItems = [
 
 function ProfileMenu({ user }) {
   const dispatch = useDispatch();
+  const nav = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const menuItems = user.role === "admin" ? adminMenuItems : userMenuItems;
   const closeMenu = () => setIsMenuOpen(false);
@@ -89,6 +90,10 @@ function ProfileMenu({ user }) {
                   case "Sign Out":
                     dispatch(removeUserFromLocal());
                     break;
+                  case "Product":
+                    nav("/admin-product")
+                    break;
+
                 }
                 closeMenu()
               }}
