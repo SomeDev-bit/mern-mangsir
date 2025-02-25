@@ -4,7 +4,7 @@ import userRoutes from './routes/userRoutes.js';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import fileUpload from 'express-fileupload';
-
+import cors from 'cors';
 const app = express();
 
 mongoose.connect(process.env.MONGO_URI).then((val) => {
@@ -15,6 +15,9 @@ mongoose.connect(process.env.MONGO_URI).then((val) => {
   console.log(err);
 });
 
+app.use(cors({
+  origin: ['http://localhost:5173'],
+}));
 app.use(express.json());
 app.use(fileUpload({
   limits: { fileSize: 5 * 1024 * 1024 },
