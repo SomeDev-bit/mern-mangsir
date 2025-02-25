@@ -5,6 +5,7 @@ import { Avatar, Button, IconButton } from '@material-tailwind/react';
 import { Card, Typography } from "@material-tailwind/react";
 import { base } from '../../app/apiUrls';
 import { useNavigate } from 'react-router';
+import RemoveDialog from './RemoveDialog';
 
 const TABLE_HEAD = ["product_image", "product_name", "product_price", "created_at", "edit", "remove"];
 
@@ -80,15 +81,15 @@ const AdminProduct = () => {
                     </Typography>
                   </td>
                   <td className={classes}>
-                    <IconButton size='sm' color='green'>
+                    <IconButton
+                      onClick={() => nav(`/edit-product/${_id}`)}
+                      size='sm' color='green'>
                       <i className="fas fa-edit" />
                     </IconButton>
 
                   </td>
                   <td className={classes}>
-                    <IconButton size='sm' color='pink'>
-                      <i className="fas fa-trash" />
-                    </IconButton>
+                    <RemoveDialog id={_id} />
 
                   </td>
                 </tr>

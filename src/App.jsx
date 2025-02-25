@@ -7,6 +7,7 @@ import Register from './features/auth/Register';
 import ProductList from './features/product/ProductList';
 import AdminProduct from './features/admin/AdminProduct';
 import AddProduct from './features/admin/AddProduct';
+import ProductEdit from './features/admin/ProductEdit';
 
 const App = () => {
 
@@ -36,6 +37,10 @@ const App = () => {
         {
           path: 'add-product',
           element: <AddProduct />,
+        },
+        {
+          path: 'edit-product/:id',
+          element: <ProductEdit />,
         },
 
 

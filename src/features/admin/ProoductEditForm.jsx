@@ -3,24 +3,25 @@ import { Formik } from 'formik'
 import React from 'react'
 import { useNavigate } from 'react-router'
 import { productSchema, validCategory } from '../../utils/validator'
-import { useAddProductMutation } from '../product/productApi'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
+import { base } from '../../app/apiUrls'
+import { useUpdateProductMutation } from '../product/productApi'
 
-const AddProduct = () => {
+const ProductEditForm = ({ product }) => {
+  const [updateProduct, { isLoading }] = useUpdateProductMutation();
   const nav = useNavigate();
-  const [addProduct, { isLoading }] = useAddProductMutation();
   const { user } = useSelector((state) => state.userSlice);
   return (
     <div className='max-w-[400px] p-4 mx-auto mt-4'>
       <Formik
         initialValues={{
-          title: '',
-          description: '',
-          price: '',
-          category: '',
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          category: product.category,
           image: null,
-          imageReview: '',
+          imageReview: product.image,
           imagePath: ''
         }}
         onSubmit={async (val) => {
@@ -29,14 +30,26 @@ const AddProduct = () => {
           formData.append('description', val.description);
           formData.append('price', val.price);
           formData.append('category', val.category);
-          formData.append('image', val.image);
+
           try {
-            await addProduct({
-              body: formData,
-              token: user.token
-            }).unwrap();
-            toast.success('Product Added Successfully');
+            if (val.image === null) {
+              await updateProduct({
+                body: formData,
+                id: product._id,
+                token: user.token
+              }).unwrap();
+            } else {
+              formData.append('image', val.image);
+              await updateProduct({
+                body: formData,
+                id: product._id,
+                token: user.token
+              }).unwrap();
+            }
+
+            toast.success('Product Updated Successfully');
             nav(-1);
+
           } catch (err) {
             toast.error(err.data?.message);
           }
@@ -47,7 +60,7 @@ const AddProduct = () => {
           <form onSubmit={handleSubmit} >
             <div className='mb-2'>
               <Typography variant="h4" color="blue-gray">
-                Add Product
+                Edit Product
               </Typography>
             </div>
 
@@ -89,6 +102,7 @@ const AddProduct = () => {
 
                 <Select
                   label='Choose a Category'
+                  value={values.category}
                   onChange={(e) => setFieldValue('category', e)}>
                   {validCategory.map((cat) => <Option key={cat} value={cat}>{cat}</Option>)}
                 </Select>
@@ -107,13 +121,17 @@ const AddProduct = () => {
                   onChange={(e) => {
                     const file = e.target.files[0];
                     setFieldValue('image', file);
+
                     setFieldValue('imagePath', file.name);
                     setFieldValue('imageReview', URL.createObjectURL(file));
                   }}
                 />
-                {['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(values.imagePath.split('.')[1]) && <div className='mb-1 mt-3'>
-                  <img className='w-full h-[150px] object-cover' src={values.imageReview} alt="img" />
+
+
+                {values.imageReview && <div className='mb-1 mt-3'>
+                  <img className='w-full h-[150px] object-cover' src={`${base}/${values.imageReview}`} alt="img" />
                 </div>}
+
                 {errors.image && touched.image && <p className='text-red-500 text-sm'>{errors.image}</p>}
               </div>
 
@@ -136,4 +154,4 @@ const AddProduct = () => {
   )
 }
 
-export default AddProduct
+export default ProductEditForm 
