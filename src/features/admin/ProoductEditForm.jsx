@@ -1,8 +1,8 @@
 import { Button, Input, Option, Select, Typography } from '@material-tailwind/react'
 import { Formik } from 'formik'
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { productSchema, validCategory } from '../../utils/validator'
+import { productSchema, validCategory, validImageType } from '../../utils/validator'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { base } from '../../app/apiUrls'
@@ -10,8 +10,12 @@ import { useUpdateProductMutation } from '../product/productApi'
 
 const ProductEditForm = ({ product }) => {
   const [updateProduct, { isLoading }] = useUpdateProductMutation();
+  const [imageErr, setImageErr] = useState(null);
+  const [imageRev, setImageRev] = useState(product.image);
+
   const nav = useNavigate();
   const { user } = useSelector((state) => state.userSlice);
+
   return (
     <div className='max-w-[400px] p-4 mx-auto mt-4'>
       <Formik
@@ -21,10 +25,10 @@ const ProductEditForm = ({ product }) => {
           price: product.price,
           category: product.category,
           image: null,
-          imageReview: product.image,
-          imagePath: ''
+
         }}
         onSubmit={async (val) => {
+          if (imageErr) return;
           const formData = new FormData();
           formData.append('title', val.title);
           formData.append('description', val.description);
@@ -111,28 +115,40 @@ const ProductEditForm = ({ product }) => {
               </div>
 
 
+              {/* Image Upload */}
               <div>
-
                 <Input
-
                   label='Select an Image'
                   type='file'
                   name='image'
                   onChange={(e) => {
                     const file = e.target.files[0];
                     setFieldValue('image', file);
+                    if (validImageType.includes(file?.type)) {
+                      setImageErr(null);
+                      setImageRev(URL.createObjectURL(file));
+                    } else {
+                      setImageErr('Invalid image type');
+                      setImageRev(null);
+                    }
 
-                    setFieldValue('imagePath', file.name);
-                    setFieldValue('imageReview', URL.createObjectURL(file));
                   }}
+
                 />
 
 
-                {values.imageReview && <div className='mb-1 mt-3'>
-                  <img className='w-full h-[150px] object-cover' src={`${base}/${values.imageReview}`} alt="img" />
-                </div>}
+                {imageErr && touched.image && <p className='text-red-500 text-sm'>{imageErr}</p>}
 
-                {errors.image && touched.image && <p className='text-red-500 text-sm'>{errors.image}</p>}
+
+                {!imageErr && values.image ? (
+                  <div className='mb-1 mt-3'>
+                    <img className='w-full h-[150px] object-cover' src={imageRev} alt="img" />
+                  </div>
+                ) : !imageErr && imageRev && (
+                  <div className='mb-1 mt-3'>
+                    <img className='w-full h-[150px] object-cover' src={`${base}/${imageRev}`} alt="img" />
+                  </div>
+                )}
               </div>
 
               <Button

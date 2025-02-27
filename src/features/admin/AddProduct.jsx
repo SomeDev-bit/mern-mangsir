@@ -1,8 +1,8 @@
 import { Button, Input, Option, Select, Typography } from '@material-tailwind/react'
 import { Formik } from 'formik'
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { productSchema, validCategory } from '../../utils/validator'
+import { productSchema, validCategory, validImageType } from '../../utils/validator'
 import { useAddProductMutation } from '../product/productApi'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
@@ -11,6 +11,9 @@ const AddProduct = () => {
   const nav = useNavigate();
   const [addProduct, { isLoading }] = useAddProductMutation();
   const { user } = useSelector((state) => state.userSlice);
+  const [imageErr, setImageErr] = useState('Invalid image type');
+  const [imageRev, setImageRev] = useState(null);
+
   return (
     <div className='max-w-[400px] p-4 mx-auto mt-4'>
       <Formik
@@ -20,16 +23,17 @@ const AddProduct = () => {
           price: '',
           category: '',
           image: null,
-          imageReview: '',
-          imagePath: ''
+
         }}
         onSubmit={async (val) => {
+          if (imageErr) return;
           const formData = new FormData();
           formData.append('title', val.title);
           formData.append('description', val.description);
           formData.append('price', val.price);
           formData.append('category', val.category);
           formData.append('image', val.image);
+
           try {
             await addProduct({
               body: formData,
@@ -43,8 +47,8 @@ const AddProduct = () => {
         }}
         validationSchema={productSchema}
       >
-        {({ handleChange, handleSubmit, values, errors, touched, setFieldValue }) => (
-          <form onSubmit={handleSubmit} >
+        {({ handleChange, handleSubmit, values, errors, touched, setFieldValue, setFieldError }) => (
+          <form onSubmit={handleSubmit}>
             <div className='mb-2'>
               <Typography variant="h4" color="blue-gray">
                 Add Product
@@ -52,7 +56,7 @@ const AddProduct = () => {
             </div>
 
             <main className='space-y-6'>
-
+              {/* Title Input */}
               <div>
                 <Input
                   onChange={handleChange}
@@ -63,8 +67,9 @@ const AddProduct = () => {
                 />
                 {errors.title && touched.title && <p className='text-red-500 text-sm'>{errors.title}</p>}
               </div>
-              <div>
 
+              {/* Description Input */}
+              <div>
                 <Input
                   onChange={handleChange}
                   value={values.description}
@@ -74,8 +79,9 @@ const AddProduct = () => {
                 />
                 {errors.description && touched.description && <p className='text-red-500 text-sm'>{errors.description}</p>}
               </div>
-              <div>
 
+              {/* Price Input */}
+              <div>
                 <Input
                   onChange={handleChange}
                   value={values.price}
@@ -85,55 +91,60 @@ const AddProduct = () => {
                 />
                 {errors.price && touched.price && <p className='text-red-500 text-sm'>{errors.price}</p>}
               </div>
-              <div>
 
+              {/* Category Select */}
+              <div>
                 <Select
                   label='Choose a Category'
                   onChange={(e) => setFieldValue('category', e)}>
                   {validCategory.map((cat) => <Option key={cat} value={cat}>{cat}</Option>)}
                 </Select>
-
                 {errors.category && touched.category && <p className='text-red-500 text-sm'>{errors.category}</p>}
               </div>
 
-
+              {/* Image Upload */}
               <div>
-
                 <Input
-
                   label='Select an Image'
                   type='file'
                   name='image'
                   onChange={(e) => {
                     const file = e.target.files[0];
                     setFieldValue('image', file);
-                    setFieldValue('imagePath', file.name);
-                    setFieldValue('imageReview', URL.createObjectURL(file));
+                    if (validImageType.includes(file?.type)) {
+                      setImageErr(null);
+                      setImageRev(URL.createObjectURL(file));
+                    } else {
+                      setImageErr('Invalid image type');
+                      setImageRev(null);
+                    }
+
                   }}
+
                 />
-                {['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(values.imagePath.split('.')[1]) && <div className='mb-1 mt-3'>
-                  <img className='w-full h-[150px] object-cover' src={values.imageReview} alt="img" />
-                </div>}
-                {errors.image && touched.image && <p className='text-red-500 text-sm'>{errors.image}</p>}
+
+
+                {imageErr && touched.image && <p className='text-red-500 text-sm'>{imageErr}</p>}
+
+
+                {!imageErr && imageRev && (
+                  <div className='mb-1 mt-3'>
+                    <img className='w-full h-[150px] object-cover' src={imageRev} alt="img" />
+                  </div>
+                )}
               </div>
 
+              {/* Submit Button */}
               <Button
                 loading={isLoading}
                 type='submit'
                 className='w-full py-[9px]' size='sm'>Submit</Button>
             </main>
-
-
           </form>
         )}
-
       </Formik>
-
-
-
-
     </div>
-  )
+  );
 }
 
-export default AddProduct
+export default AddProduct;
