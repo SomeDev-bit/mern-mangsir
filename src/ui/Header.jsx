@@ -19,6 +19,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { removeUserFromLocal } from "../features/auth/userSlice";
+import { removeCart } from "../features/cart/cartSlice";
 
 const userMenuItems = [
   {
@@ -89,9 +90,13 @@ function ProfileMenu({ user }) {
                 switch (label) {
                   case "Sign Out":
                     dispatch(removeUserFromLocal());
+                    dispatch(removeCart());
                     break;
                   case "Product":
-                    nav("/admin-product")
+                    nav("/admin-product");
+                    break;
+                  case "Carts":
+                    nav("/cart-page");
                     break;
 
                 }

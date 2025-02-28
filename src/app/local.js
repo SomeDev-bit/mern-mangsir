@@ -12,3 +12,14 @@ export const getCookie = () => {
 export const removeCookie = (user) => {
   Cookies.remove('user');
 }
+
+export const setCartsToLocal = (carts) => {
+  localStorage.setItem('carts', JSON.stringify(carts));
+}
+export const getCartsFromLocal = () => {
+  const carts = localStorage.getItem('carts');
+  return carts ? JSON.parse(carts) : [];
+}
+export const removeCartsFromLocal = () => {
+  localStorage.removeItem('carts');
+}
