@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useGetProductQuery } from './productApi';
 import { base } from '../../app/apiUrls';
 import { Button, Card, IconButton, Typography } from "@material-tailwind/react";
@@ -45,8 +45,10 @@ export function CartTable({ product }) {
   const cart = carts.find((cart) => cart._id === product._id);
   const dispatch = useDispatch();
   const [qty, setQty] = useState(cart?.qty ?? 1);
+  const nav = useNavigate();
   const handleAdd = () => {
     dispatch(setCart({ ...product, qty }));
+    nav('/cart-page');
   }
   return (
     <Card className="flex justify-center gap-6 w-full items-center p-5">

@@ -1,47 +1,45 @@
 import React from 'react'
-import { useSelector } from 'react-redux';
-import { Card, Typography } from "@material-tailwind/react";
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, Card, IconButton, Typography } from "@material-tailwind/react";
+import { base } from '../../app/apiUrls';
+import QtyComponent from './QtyComponent';
+import { removeCart, singleRemoveCart } from './cartSlice';
+import { useCreateOrderMutation } from '../order/orderApi';
+import { toast } from 'react-toastify';
 
 const TABLE_HEAD = ["Item", "Price", "Quantity", "Total"];
 
-const TABLE_ROWS = [
-  {
-    name: "John Michael",
-    job: "Manager",
-    date: "23/04/18",
-  },
-  {
-    name: "Alexa Liras",
-    job: "Developer",
-    date: "23/04/18",
-  },
-  {
-    name: "Laurent Perrier",
-    job: "Executive",
-    date: "19/09/17",
-  },
-  {
-    name: "Michael Levi",
-    job: "Developer",
-    date: "24/12/08",
-  },
-  {
-    name: "Richard Gran",
-    job: "Manager",
-    date: "04/10/21",
-  },
-];
-
 const CartPage = () => {
+  const [addOrder, { isLoading }] = useCreateOrderMutation();
+  const { carts } = useSelector(state => state.cartSlice);
+  const { user } = useSelector(state => state.userSlice);
+  const dispatch = useDispatch();
+  const totalAmount = carts.reduce((acc, item) => acc + item.price * item.qty, 0);
 
-  const carts = useSelector(state => state.cartSlice);
+  const handleOrder = async () => {
+    try {
+      await addOrder({
+        token: user.token,
+        totalAmount,
+        products: carts.map((cart) => ({
+          productId: cart._id,
+          qty: cart.qty
+        }))
+      }).unwrap();
+      dispatch(removeCart());
+      toast.success('Order Placed Successfully');
+    } catch (err) {
+      toast.error(err.data?.message);
+    }
+  }
+
+
   return (
-    <div>
+    <div className='px-20 pt-7'>
 
       {carts.length === 0 ? <div className='text-center text-2xl font-bold'>No Product Added</div> :
 
-
-        <div>
+        <div className=''>
           <Card className="h-full w-full overflow-scroll">
             <table className="w-full min-w-max table-auto text-left">
               <thead>
@@ -63,20 +61,20 @@ const CartPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {TABLE_ROWS.map(({ name, job, date }, index) => {
-                  const isLast = index === TABLE_ROWS.length - 1;
+                {carts.map((cart, index) => {
+                  const isLast = index === carts.length - 1;
                   const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
 
                   return (
-                    <tr key={name}>
+                    <tr key={index}>
                       <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {name}
-                        </Typography>
+                        <div className='flex items-center gap-4'>
+                          <div>
+                            <img className='h-[90px] w-[90px] object-cover' src={`${base}${cart.image}`} alt="" />
+                          </div>
+                          <p>{cart.title}</p>
+
+                        </div>
                       </td>
                       <td className={classes}>
                         <Typography
@@ -84,28 +82,24 @@ const CartPage = () => {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {job}
+                          {cart.price}
                         </Typography>
                       </td>
                       <td className={classes}>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {date}
-                        </Typography>
+
+                        <QtyComponent cart={cart} />
+
                       </td>
                       <td className={classes}>
-                        <Typography
-                          as="a"
-                          href="#"
-                          variant="small"
-                          color="blue-gray"
-                          className="font-medium"
-                        >
-                          Edit
-                        </Typography>
+                        <div className='flex items-center gap-4'>
+                          <p>   {`Rs. ${cart.price * cart.qty}`}</p>
+                          <IconButton
+                            onClick={() => dispatch(singleRemoveCart(index))}
+                            variant='outlined'
+                            className='rounded-full'
+                            size='sm'><i className="fas fa-close" /></IconButton>
+                        </div>
+
                       </td>
                     </tr>
                   );
@@ -113,8 +107,17 @@ const CartPage = () => {
               </tbody>
             </table>
           </Card>
+          <div className='flex justify-end mt-5 text-2xl font-bold'>Total Amount: Rs. {totalAmount}</div>
+          <div className='flex justify-end'>
+            <Button
+              onClick={handleOrder}
+              loading={isLoading}
+              className='mt-5 ' >Place Order</Button>
+          </div>
+
         </div>
       }
+
 
     </div>
   )
