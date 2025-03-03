@@ -10,6 +10,7 @@ import AddProduct from './features/admin/AddProduct';
 import ProductEdit from './features/admin/ProductEdit';
 import ProductDetail from './features/product/ProductDetail';
 import CartPage from './features/cart/CartPage';
+import Profile from './features/profile/Profile';
 
 const App = () => {
 
@@ -33,6 +34,10 @@ const App = () => {
         {
           path: 'register',
           element: <Register />,
+        },
+        {
+          path: 'user-profile',
+          element: <Profile />,
         },
         {
           path: 'product-detail/:id',

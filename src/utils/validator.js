@@ -17,6 +17,12 @@ export const loginSchema = Yup.object({
 });
 
 
+export const updateSchema = Yup.object({
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  username: Yup.string().required('Username is required'),
+});
+
+
 export const registerSchema = Yup.object({
   username: Yup.string().required('Username is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),

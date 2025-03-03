@@ -16,15 +16,19 @@ const CartPage = () => {
   const dispatch = useDispatch();
   const totalAmount = carts.reduce((acc, item) => acc + item.price * item.qty, 0);
 
+
   const handleOrder = async () => {
     try {
       await addOrder({
         token: user.token,
-        totalAmount,
-        products: carts.map((cart) => ({
-          productId: cart._id,
-          qty: cart.qty
-        }))
+        body: {
+          totalAmount,
+          products: carts.map((cart) => ({
+            productId: cart._id,
+            qty: cart.qty
+          }))
+        }
+
       }).unwrap();
       dispatch(removeCart());
       toast.success('Order Placed Successfully');
