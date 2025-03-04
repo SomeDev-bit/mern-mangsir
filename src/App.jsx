@@ -11,6 +11,8 @@ import ProductEdit from './features/admin/ProductEdit';
 import ProductDetail from './features/product/ProductDetail';
 import CartPage from './features/cart/CartPage';
 import Profile from './features/profile/Profile';
+import OrderDetail from './features/order/OrderDetail';
+import AuthRoutes from './ui/AuthRoutes';
 
 const App = () => {
 
@@ -35,10 +37,18 @@ const App = () => {
           path: 'register',
           element: <Register />,
         },
+
+        // logged user routes
         {
-          path: 'user-profile',
-          element: <Profile />,
+          element: <AuthRoutes />,
+          children: [
+            {
+              path: 'user-profile',
+              element: <Profile />,
+            },
+          ]
         },
+
         {
           path: 'product-detail/:id',
           element: <ProductDetail />,
@@ -61,6 +71,11 @@ const App = () => {
           path: 'cart-page',
           element: <CartPage />,
         },
+
+        {
+          path: 'order/:id',
+          element: <OrderDetail />,
+        }
 
 
       ]

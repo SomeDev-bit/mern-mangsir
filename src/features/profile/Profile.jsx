@@ -8,7 +8,7 @@ const Profile = () => {
 
 
   return (
-    <div className='p-4 grid grid-cols-3 gap-5'>
+    <div className='p-4 grid grid-cols-3 gap-10'>
 
       <ProfileForm user={user} />
       <OrderList user={user} />

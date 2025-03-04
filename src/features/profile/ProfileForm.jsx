@@ -11,8 +11,8 @@ const ProfileForm = ({ user }) => {
   const [updateUser, { isLoading: updateLoading }] = useUpdateUserMutation();
   const dispatch = useDispatch();
   const { data, isLoading, error } = useGetUserQuery({
-    token: user.token,
-    id: user.userId
+    token: user?.token,
+    id: user?.userId
   });
 
   if (isLoading) return <h1>Loading...</h1>

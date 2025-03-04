@@ -7,8 +7,29 @@ export const orderApi = createApi({
   endpoints: (builder) => ({
 
     getOrders: builder.query({
-      query: () => ({
+      query: (token) => ({
         url: '/',
+        headers: {
+          Authorization: token
+        },
+        method: 'GET'
+      }),
+      providesTags: ['Order'],
+    }),
+    getOrderById: builder.query({
+      query: (id) => ({
+        url: `/${id}`,
+        method: 'GET'
+      }),
+      providesTags: ['Order'],
+    }),
+
+    getUserOrders: builder.query({
+      query: (q) => ({
+        url: `/users/${q.id}`,
+        headers: {
+          Authorization: q.token
+        },
         method: 'GET'
       }),
       providesTags: ['Order'],
@@ -31,4 +52,4 @@ export const orderApi = createApi({
   }),
 })
 
-export const { useGetOrdersQuery, useCreateOrderMutation } = orderApi;
+export const { useGetOrdersQuery, useCreateOrderMutation, useGetUserOrdersQuery, useGetOrderByIdQuery } = orderApi;
